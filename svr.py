@@ -10,13 +10,27 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
-# read dataset
+# ===================== Part 1: Read Dataset =====================
 dataFile = 'audi.csv'
 data = pd.read_csv(dataFile, sep=',')
 print(data)
 
-# one-hot encoding for categorical attributes
+# ===================== Part 2: EDA =====================
+# print(data.head())
+# print(data.isnull().sum())
+# print(data.describe())
+
+# compute age of car by subtracting 2020 from the 'year' field
+data["age_of_car"] = 2020 - data["year"]
+data = data.drop(columns=["year"])
+
 data_onehot = pd.get_dummies(data, columns=['model', 'transmission', 'fuelType'])
+
+# standard Scaler to scale all variables
+std = StandardScaler()
+data_onehot_std = std.fit_transform(data_onehot)
+data_onehot_std = pd.DataFrame(data_onehot_std, columns=data_onehot.columns)
+
 X = data_onehot.drop(['price'], axis=1)
 Y = data_onehot['price']
 
