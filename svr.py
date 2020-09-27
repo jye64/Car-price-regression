@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import sklearn as sk
+
 from sklearn.svm import SVR
 from sklearn import preprocessing
 from sklearn.pipeline import make_pipeline
@@ -39,7 +40,7 @@ print('Cross Validation Score: ' + str(CVScores))
 # split train and test sets
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
 regr.fit(X_train,Y_train)
-print(regr.score(X_test,Y_test))
+print('Test Set Score: ' + str(regr.score(X_test,Y_test)))
 
 results = X_test.copy()
 results["predicted"] = regr.predict(X_test)
