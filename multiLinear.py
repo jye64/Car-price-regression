@@ -37,24 +37,22 @@ data = data.drop(columns=["year"])
 # one-hot encoding for categorical attributes
 data_onehot = pd.get_dummies(data, columns=['model', 'transmission', 'fuelType'])
 
-# standard Scaler to scale all variables
-std = StandardScaler()
-data_onehot_std = std.fit_transform(data_onehot)
-data_onehot_std = pd.DataFrame(data_onehot_std, columns=data_onehot.columns)
+X = data_onehot.drop(['price'], axis=1)
+Y = data_onehot[['price']]
 
-X = data_onehot_std.drop(['price'], axis=1)
-Y = data_onehot_std[['price']]
+# standard Scaler to scale X
+scalerX = StandardScaler().fit(X)
+X_std = scalerX.transform(X)
+X_std = pd.DataFrame(X_std, columns=X.columns)
 
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=25)
+X_train, X_test, Y_train, Y_test = train_test_split(X_std, Y, test_size=0.2, random_state=25)
 
 # TODO: K-fold cross validation
 # kf = KFold(n_splits=5)
 
 regr = linear_model.LinearRegression()
 regr.fit(X_train, Y_train)
-print(regr.score(X, Y))
-
-X_test = std.inverse_transform(X_test)
+print(regr.score(X_test,Y_test))
 
 # prediction
 results = X_test.copy()
