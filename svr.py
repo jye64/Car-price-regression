@@ -6,7 +6,6 @@ import seaborn as sns
 import sklearn as sk
 
 from sklearn.svm import SVR
-from sklearn import preprocessing
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split

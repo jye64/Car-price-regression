@@ -6,7 +6,6 @@ import seaborn as sns
 import sklearn as sk
 
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
 from sklearn.ensemble import RandomForestRegressor
