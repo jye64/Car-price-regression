@@ -10,6 +10,8 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
+from sklearn.metrics import mean_absolute_error
+
 
 # ===================== Part 1: Read Dataset =====================
 dataFile = 'audi.csv'
@@ -40,6 +42,15 @@ print('Cross Validation Score: ' + str(CVScores))
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
 regr.fit(X_train,Y_train)
 print('Test Set Score: ' + str(regr.score(X_test,Y_test)))
+
+
+def mean_absolute_percentage_error(y_true, y_pred):
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+
+
+print('Test Set RMSE: ' + str(mean_absolute_error(Y_test, regr.predict(X_test)).round(2)))
+print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test)).round(2)) + '%')
 
 results = X_test.copy()
 results["predicted"] = regr.predict(X_test)

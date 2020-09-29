@@ -61,7 +61,8 @@ def mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
 
-print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test))))
+print('Test Set RMSE: ' + str(mean_absolute_error(Y_test, regr.predict(X_test)).round(2)))
+print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test)).round(2)) + '%')
 
 results = X_test.copy()
 results["predicted"] = regr.predict(X_test)
