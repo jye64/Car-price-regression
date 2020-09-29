@@ -29,15 +29,14 @@ X = data_onehot.drop(['price'], axis=1)
 Y = data_onehot['price']
 
 
+# split train and test sets
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=0)
+
+
 # ===================== Part 3: Modeling =====================
 # Support vector regression
 regr = make_pipeline(StandardScaler(),SVR(kernel='linear', C=1.0, epsilon=0.2))
-
-# split train and test sets
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
-
 regr.fit(X_train,Y_train)
-print('Test Set Score: ' + str(regr.score(X_test, Y_test)))
 
 results = X_test.copy()
 results["predicted"] = regr.predict(X_test)
@@ -54,6 +53,7 @@ def mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
 
+print('Test Set Score: ' + str(regr.score(X_test, Y_test)))
 print('Test Set MAE: ' + str(mean_absolute_error(Y_test, regr.predict(X_test)).round(2)))
 print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test)).round(2)) + '%')
 
