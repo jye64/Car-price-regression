@@ -48,7 +48,6 @@ X_std = pd.DataFrame(X_std, columns=X.columns)
 # split training and test set
 X_train, X_test, Y_train, Y_test = train_test_split(X_std, Y, test_size=0.2, random_state=0)
 
-
 # ===================== Part 3: Modeling =====================
 # linear regression
 regr = linear_model.LinearRegression()
@@ -69,9 +68,13 @@ def mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
 
+print('Train Set Score: ' + str(regr.score(X_train, Y_train)))
+print('Train Set MAE: ' + str(mean_absolute_error(Y_train, regr.predict(X_train)).round(2)))
+print('Train Set MAPE: ' + str(mean_absolute_percentage_error(Y_train, regr.predict(X_train)).round(2)) + '%' + '\n')
+
 print('Test Set Score: ' + str(regr.score(X_test, Y_test)))
 print('Test Set MAE: ' + str(mean_absolute_error(Y_test, regr.predict(X_test)).round(2)))
-print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test)).round(2)) + '%')
+print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test)).round(2)) + '%' + '\n')
 
 # 5 - fold Cross Validation
 CVScores = cross_val_score(regr, X_std, Y, cv=5)
