@@ -28,6 +28,9 @@ plt.show()
 sns.countplot(x="fuelType", data=data)
 plt.show()
 
+sns.pairplot(data)
+plt.show()
+
 # compute age of car by subtracting 2020 from the 'year' field
 data["age_of_car"] = 2020 - data["year"]
 data = data.drop(columns=["year"])

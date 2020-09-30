@@ -35,7 +35,7 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_
 
 # ===================== Part 3: Modeling =====================
 # Support vector regression
-regr = make_pipeline(StandardScaler(),SVR(kernel='linear', C=1.0, epsilon=0.2))
+regr = make_pipeline(StandardScaler(),SVR(kernel='linear', C=1.0, epsilon=0.1))
 regr.fit(X_train,Y_train)
 
 results = X_test.copy()

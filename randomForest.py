@@ -36,7 +36,7 @@ X_train, X_test, Y_train, Y_test = train_test_split(X_std, Y, test_size=0.2, ran
 
 # ===================== Part 3: Modeling =====================
 # random forest regression
-regr = RandomForestRegressor(random_state=1)
+regr = RandomForestRegressor()
 regr.fit(X_train, Y_train)
 
 results = X_test.copy()
