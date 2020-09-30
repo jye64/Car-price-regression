@@ -71,6 +71,6 @@ print('Cross Validation R^2 Score: ' + str(CVScores))
 # Mean Absolute Error
 CV = cross_validate(regr, X, Y, cv=5, scoring='neg_mean_absolute_error')
 CV['test_score'] = -CV['test_score']
-print('Cross Validation MAE: ' + str(CV['test_score']))
-print('Cross Validation Overall MAE: ' + str(np.mean(CV['test_score'])))
+print('Cross Validation MAE: ' + str(CV['test_score'].round(2)))
+print('Cross Validation Overall MAE: ' + str(np.mean(CV['test_score']).round(2)))
 
