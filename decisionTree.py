@@ -18,12 +18,29 @@ data = pd.read_csv(dataFile, sep=',')
 print(data)
 
 # ===================== Part 2: EDA and Preprocessing =====================
+print(data.isnull().sum())
+print(data.describe())
+
+sns.countplot(x="transmission", data=data)
+plt.show()
+
+sns.countplot(y=data["model"])
+plt.show()
+
+sns.countplot(x="fuelType", data=data)
+plt.show()
+
+sns.pairplot(data)
+plt.show()
+
 # compute age of car by subtracting 2020 from the 'year' field
 data["age_of_car"] = 2020 - data["year"]
 data = data.drop(columns=["year"])
 
+# one-hot encoding for categorical attributes
 data_onehot = pd.get_dummies(data, columns=['model', 'transmission', 'fuelType'])
 
+# separate features and target variable
 X = data_onehot.drop(['price'], axis=1)
 Y = data_onehot['price']
 
