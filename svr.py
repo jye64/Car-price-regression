@@ -9,7 +9,6 @@ from sklearn.svm import SVR
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import mean_absolute_error
 
@@ -72,20 +71,14 @@ def mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
 
-print('Train Set R^2 Score: ' + str(regr.score(X_train, Y_train)))
 print('Train Set MAE: ' + str(mean_absolute_error(Y_train, regr.predict(X_train)).round(2)))
 print('Train Set MAPE: ' + str(mean_absolute_percentage_error(Y_train, regr.predict(X_train)).round(2)) + '%' + '\n')
 
-print('Test Set R^2 Score: ' + str(regr.score(X_test, Y_test)))
 print('Test Set MAE: ' + str(mean_absolute_error(Y_test, regr.predict(X_test)).round(2)))
 print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test)).round(2)) + '%' + '\n')
 
 
 # 5 - fold Cross Validation
-# R^2 score
-CVScores = cross_val_score(regr, X, Y, cv=5)
-print('Cross Validation R^2 Score: ' + str(CVScores))
-
 # Mean Absolute Error
 CV = cross_validate(regr, X, Y, cv=5, scoring='neg_mean_absolute_error')
 CV['test_score'] = -CV['test_score']
