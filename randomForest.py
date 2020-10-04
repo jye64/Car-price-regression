@@ -9,6 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_validate
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_squared_error
 
 # ===================== Part 1: Read Dataset =====================
 dataFile = 'audi.csv'
@@ -72,15 +73,17 @@ def mean_absolute_percentage_error(y_true, y_pred):
 
 
 print('Train Set MAE: ' + str(mean_absolute_error(Y_train, regr.predict(X_train)).round(2)))
+print('Train Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_train, regr.predict(X_train))).round(2)))
 print('Train Set MAPE: ' + str(mean_absolute_percentage_error(Y_train, regr.predict(X_train)).round(2)) + '%' + '\n')
 
 print('Test Set MAE: ' + str(mean_absolute_error(Y_test, regr.predict(X_test)).round(2)))
+print('Test Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_test, regr.predict(X_test))).round(2)))
 print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test)).round(2)) + '%' + '\n')
 
 # 5 - fold Cross Validation
 # Mean Absolute Error
-CV = cross_validate(regr, X_std, Y, cv=5, scoring='neg_mean_absolute_error')
+CV = cross_validate(regr, X_std, Y, cv=5, scoring='neg_root_mean_squared_error')
 CV['test_score'] = -CV['test_score']
-print('Cross Validation MAE: ' + str(CV['test_score'].round(2)))
-print('Cross Validation Overall MAE: ' + str(np.mean(CV['test_score']).round(2)))
+print('Cross Validation RMSE: ' + str(CV['test_score'].round(2)))
+print('Cross Validation Overall RMSE: ' + str(np.mean(CV['test_score']).round(2)))
 
