@@ -10,6 +10,7 @@ from sklearn.model_selection import cross_validate
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_squared_error
+from sklearn.pipeline import make_pipeline
 
 # ===================== Part 1: Read Dataset =====================
 dataFile = 'audi.csv'
@@ -43,22 +44,26 @@ data_onehot = pd.get_dummies(data, columns=['model', 'transmission', 'fuelType']
 X = data_onehot.drop(['price'], axis=1)
 Y = data_onehot['price']
 
-# standard Scaler to scale X
-scalerX = StandardScaler().fit(X)
-X_std = scalerX.transform(X)
-X_std = pd.DataFrame(X_std, columns=X.columns)
-
 # split training and test set
-X_train, X_test, Y_train, Y_test = train_test_split(X_std, Y, test_size=0.2, random_state=0)
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=0)
+
+# standard Scaler to scale training data in X
+scalerX = StandardScaler().fit(X_train)
+X_train_std = scalerX.transform(X_train)
+X_train_std = pd.DataFrame(X_train_std, columns=X_train.columns)
+
+# apply the same scaler on testing data
+X_test_std = scalerX.transform(X_test)
+X_test_std = pd.DataFrame(X_test_std, columns=X_test.columns)
 
 
 # ===================== Part 3: Modeling =====================
 # random forest regression
 regr = RandomForestRegressor()
-regr.fit(X_train, Y_train)
+regr.fit(X_train_std, Y_train)
 
 results = X_test.copy()
-results["predicted"] = regr.predict(X_test)
+results["predicted"] = regr.predict(X_test_std)
 results["actual"] = Y_test
 results = results[['predicted', 'actual']]
 results['predicted'] = results['predicted'].round(2)
@@ -72,17 +77,19 @@ def mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
 
-print('Train Set MAE: ' + str(mean_absolute_error(Y_train, regr.predict(X_train)).round(2)))
-print('Train Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_train, regr.predict(X_train))).round(2)))
-print('Train Set MAPE: ' + str(mean_absolute_percentage_error(Y_train, regr.predict(X_train)).round(2)) + '%' + '\n')
+print('Train Set MAE: ' + str(mean_absolute_error(Y_train, regr.predict(X_train_std)).round(2)))
+print('Train Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_train, regr.predict(X_train_std))).round(2)))
+print('Train Set MAPE: ' + str(mean_absolute_percentage_error(Y_train, regr.predict(X_train_std)).round(2)) + '%' + '\n')
 
-print('Test Set MAE: ' + str(mean_absolute_error(Y_test, regr.predict(X_test)).round(2)))
-print('Test Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_test, regr.predict(X_test))).round(2)))
-print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test)).round(2)) + '%' + '\n')
+print('Test Set MAE: ' + str(mean_absolute_error(Y_test, regr.predict(X_test_std)).round(2)))
+print('Test Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_test, regr.predict(X_test_std))).round(2)))
+print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test_std)).round(2)) + '%' + '\n')
+
 
 # 5 - fold Cross Validation
-# Mean Absolute Error
-CV = cross_validate(regr, X_std, Y, cv=5, scoring='neg_root_mean_squared_error')
+# RMSE
+pipe = make_pipeline(StandardScaler(), regr)
+CV = cross_validate(pipe, X, Y, cv=5, scoring='neg_root_mean_squared_error')
 CV['test_score'] = -CV['test_score']
 print('Cross Validation RMSE: ' + str(CV['test_score'].round(2)))
 print('Cross Validation Overall RMSE: ' + str(np.mean(CV['test_score']).round(2)))
