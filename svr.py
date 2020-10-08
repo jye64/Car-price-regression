@@ -6,7 +6,6 @@ import seaborn as sns
 import sklearn as sk
 
 from sklearn.svm import SVR
-from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_validate
@@ -51,16 +50,24 @@ Y = data_onehot['price']
 # split train and test sets
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
 
+# standard Scaler to fit training data in X
+scalerX = StandardScaler().fit(X_train)
+X_train_std = scalerX.transform(X_train)
+X_train_std = pd.DataFrame(X_train_std, columns=X_train.columns)
+
+# apply the same scaler on testing data
+X_test_std = scalerX.transform(X_test)
+X_test_std = pd.DataFrame(X_test_std, columns=X_test.columns)
+
 
 # ===================== Part 3: Modeling =====================
 # Support vector regression
-# use pipeline to combine standardization and model into one instance
-regr = make_pipeline(StandardScaler(), SVR(kernel='linear', C=1.0, epsilon=0.1))
-regr.fit(X_train, Y_train)
+regr = SVR(kernel='linear', C=1.0, epsilon=0.1)
+regr.fit(X_train_std, Y_train)
 
-results = X_test.copy()
-results["predicted"] = regr.predict(X_test)
-results["actual"]= Y_test
+results = X_train.copy()
+results["predicted"] = regr.predict(X_train_std)
+results["actual"] = Y_train
 results = results[['predicted', 'actual']]
 results['predicted'] = results['predicted'].round(2)
 print(results)
@@ -73,19 +80,23 @@ def mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
 
-print('Train Set MAE: ' + str(mean_absolute_error(Y_train, regr.predict(X_train)).round(2)))
-print('Train Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_train, regr.predict(X_train))).round(2)))
-print('Train Set MAPE: ' + str(mean_absolute_percentage_error(Y_train, regr.predict(X_train)).round(2)) + '%' + '\n')
-
-print('Test Set MAE: ' + str(mean_absolute_error(Y_test, regr.predict(X_test)).round(2)))
-print('Test Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_test, regr.predict(X_test))).round(2)))
-print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test)).round(2)) + '%' + '\n')
+print('Train Set MAE: ' + str(mean_absolute_error(Y_train, regr.predict(X_train_std)).round(2)))
+print('Train Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_train, regr.predict(X_train_std))).round(2)))
+print('Train Set MAPE: ' + str(mean_absolute_percentage_error(Y_train, regr.predict(X_train_std)).round(2)) + '%' + '\n')
 
 
 # 5 - fold Cross Validation
 # RMSE
-CV = cross_validate(regr, X, Y, cv=5, scoring='neg_root_mean_squared_error')
+CV = cross_validate(regr, X_train_std, Y_train, cv=5, scoring='neg_root_mean_squared_error')
 CV['test_score'] = -CV['test_score']
 print('Cross Validation RMSE: ' + str(CV['test_score'].round(2)))
-print('Cross Validation Overall RMSE: ' + str(np.mean(CV['test_score']).round(2)))
+print('Cross Validation Overall RMSE: ' + str(np.mean(CV['test_score']).round(2)) + '\n')
+
+
+# after validating the model, use the test set to compute generalization error
+print('Test Set MAE: ' + str(mean_absolute_error(Y_test, regr.predict(X_test_std)).round(2)))
+print('Test Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_test, regr.predict(X_test_std))).round(2)))
+print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test_std)).round(2)) + '%')
+
+
 

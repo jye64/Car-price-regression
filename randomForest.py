@@ -10,7 +10,6 @@ from sklearn.model_selection import cross_validate
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_squared_error
-from sklearn.pipeline import make_pipeline
 
 # ===================== Part 1: Read Dataset =====================
 dataFile = 'audi.csv'
@@ -62,9 +61,9 @@ X_test_std = pd.DataFrame(X_test_std, columns=X_test.columns)
 regr = RandomForestRegressor()
 regr.fit(X_train_std, Y_train)
 
-results = X_test.copy()
-results["predicted"] = regr.predict(X_test_std)
-results["actual"] = Y_test
+results = X_train.copy()
+results["predicted"] = regr.predict(X_train_std)
+results["actual"] = Y_train
 results = results[['predicted', 'actual']]
 results['predicted'] = results['predicted'].round(2)
 print(results)
@@ -81,16 +80,19 @@ print('Train Set MAE: ' + str(mean_absolute_error(Y_train, regr.predict(X_train_
 print('Train Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_train, regr.predict(X_train_std))).round(2)))
 print('Train Set MAPE: ' + str(mean_absolute_percentage_error(Y_train, regr.predict(X_train_std)).round(2)) + '%' + '\n')
 
-print('Test Set MAE: ' + str(mean_absolute_error(Y_test, regr.predict(X_test_std)).round(2)))
-print('Test Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_test, regr.predict(X_test_std))).round(2)))
-print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test_std)).round(2)) + '%' + '\n')
 
-
-# 5 - fold Cross Validation
+# 5 - fold Cross Validation on training data for model validation
 # RMSE
-pipe = make_pipeline(StandardScaler(), regr)
-CV = cross_validate(pipe, X, Y, cv=5, scoring='neg_root_mean_squared_error')
+CV = cross_validate(regr, X_train_std, Y_train, cv=5, scoring='neg_root_mean_squared_error')
 CV['test_score'] = -CV['test_score']
 print('Cross Validation RMSE: ' + str(CV['test_score'].round(2)))
-print('Cross Validation Overall RMSE: ' + str(np.mean(CV['test_score']).round(2)))
+print('Cross Validation Overall RMSE: ' + str(np.mean(CV['test_score']).round(2)) + '\n')
+
+
+# after validating the model, use the test set to compute generalization error
+print('Test Set MAE: ' + str(mean_absolute_error(Y_test, regr.predict(X_test_std)).round(2)))
+print('Test Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_test, regr.predict(X_test_std))).round(2)))
+print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test_std)).round(2)) + '%')
+
+
 
