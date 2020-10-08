@@ -54,6 +54,7 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_
 
 # ===================== Part 3: Modeling =====================
 # Support vector regression
+# use pipeline to combine standardization and model into one instance
 regr = make_pipeline(StandardScaler(), SVR(kernel='linear', C=1.0, epsilon=0.1))
 regr.fit(X_train, Y_train)
 
@@ -82,7 +83,7 @@ print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predic
 
 
 # 5 - fold Cross Validation
-# Mean Absolute Error
+# RMSE
 CV = cross_validate(regr, X, Y, cv=5, scoring='neg_root_mean_squared_error')
 CV['test_score'] = -CV['test_score']
 print('Cross Validation RMSE: ' + str(CV['test_score'].round(2)))

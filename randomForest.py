@@ -47,7 +47,7 @@ Y = data_onehot['price']
 # split training and test set
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=0)
 
-# standard Scaler to scale training data in X
+# standard Scaler to fit training data in X
 scalerX = StandardScaler().fit(X_train)
 X_train_std = scalerX.transform(X_train)
 X_train_std = pd.DataFrame(X_train_std, columns=X_train.columns)
