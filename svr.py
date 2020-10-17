@@ -65,12 +65,25 @@ X_test_std = pd.DataFrame(X_test_std, columns=X_test.columns)
 regr = SVR(kernel='linear', C=1.0, epsilon=0.1)
 regr.fit(X_train_std, Y_train)
 
+# copy the DataFrame indexes
 results = X_train.copy()
 results["predicted"] = regr.predict(X_train_std)
 results["actual"] = Y_train
 results = results[['predicted', 'actual']]
 results['predicted'] = results['predicted'].round(2)
 print(results)
+
+# reset the index of DataFrame and use the default indexing (0 1 2 3...N-1)
+results = pd.DataFrame.reset_index(results, drop=True)
+
+# visualize predicted vs actual in train set
+plt.plot(results['predicted'].head(100), label='predicted')
+plt.plot(results['actual'].head(100), label='actual')
+plt.xlabel('index in train set')
+plt.ylabel('price')
+plt.title('SVR: Predicted vs Actual in Train set')
+plt.legend()
+plt.show()
 
 
 # ===================== Part 4: Accuracy & Evaluation =====================
@@ -96,7 +109,25 @@ print('Cross Validation Overall RMSE: ' + str(np.mean(CV['test_score']).round(2)
 # after validating the model, use the test set to compute generalization error
 print('Test Set MAE: ' + str(mean_absolute_error(Y_test, regr.predict(X_test_std)).round(2)))
 print('Test Set RMSE: ' + str(np.sqrt(mean_squared_error(Y_test, regr.predict(X_test_std))).round(2)))
-print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test_std)).round(2)) + '%')
+print('Test Set MAPE: ' + str(mean_absolute_percentage_error(Y_test, regr.predict(X_test_std)).round(2)) + '%' + '\n')
 
 
+# copy the DataFrame indexes
+test_results = X_test.copy()
+test_results["predicted"] = regr.predict(X_test_std)
+test_results["actual"] = Y_test
+test_results = test_results[['predicted', 'actual']]
+test_results['predicted'] = test_results['predicted'].round(2)
+print(test_results)
 
+# reset the index of DataFrame and use the default indexing (0 1 2 3...N-1)
+test_results = pd.DataFrame.reset_index(test_results, drop=True)
+
+# visualize predicted vs actual in test set
+plt.plot(test_results['predicted'].head(100), label='predicted')
+plt.plot(test_results['actual'].head(100), label='actual')
+plt.xlabel('index in test set')
+plt.ylabel('price')
+plt.title('SVR: Predicted vs Actual in test set')
+plt.legend()
+plt.show()
