@@ -1,3 +1,9 @@
+"""
+Author: Jianping Ye
+Date: 2020.10.20
+Dataset: https://www.kaggle.com/adityadesai13/used-car-dataset-ford-and-mercedes
+Description: Car Price Regression Models
+"""
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -70,9 +76,8 @@ X_test_std = pd.DataFrame(X_test_std, columns=X_test.columns)
 
 models_to_evaluate = [DecisionTreeRegressor(), SVR(kernel='linear'), RandomForestRegressor()]
 
-for model in models_to_evaluate:
-    regr = model
-    model_name = str(model)
+for regr in models_to_evaluate:
+    model_name = str(regr)
     regr.fit(X_train_std, Y_train)
 
     # copy the DataFrame indexes
@@ -105,13 +110,14 @@ def mean_absolute_percentage_error(y_true, y_pred):
 model_performance = pd.DataFrame(columns=['Model', 'Train MAE', 'Train RMSE', 'Train MAPE',
                                           'CV RMSE', 'Test MAE', 'Test RMSE', 'Test MAPE'])
 
-for model in models_to_evaluate:
-    regr = model
-    model_name = str(model)
+for regr in models_to_evaluate:
+    model_name = str(regr)
 
-    Train_MAE = mean_absolute_error(Y_train, regr.predict(X_train_std)).round(2)
-    Train_RMSE = np.sqrt(mean_squared_error(Y_train, regr.predict(X_train_std))).round(2)
-    Train_MAPE = mean_absolute_percentage_error(Y_train, regr.predict(X_train_std)).round(2)
+    Y_train_pred = regr.predict(X_train_std)
+
+    Train_MAE = mean_absolute_error(Y_train, Y_train_pred).round(2)
+    Train_RMSE = np.sqrt(mean_squared_error(Y_train, Y_train_pred).round(2))
+    Train_MAPE = mean_absolute_percentage_error(Y_train, Y_train_pred).round(2)
 
     # 5 - fold Cross Validation on training data for model validation
     # RMSE
@@ -120,9 +126,11 @@ for model in models_to_evaluate:
     CV_Overall_RMSE = np.mean(CV['test_score']).round(2)
 
     # after validating the model, use the test set to compute generalization error
-    Test_MAE = mean_absolute_error(Y_test, regr.predict(X_test_std)).round(2)
-    Test_RMSE = np.sqrt(mean_squared_error(Y_test, regr.predict(X_test_std))).round(2)
-    Test_MAPE = mean_absolute_percentage_error(Y_test, regr.predict(X_test_std)).round(2)
+    Y_test_pred = regr.predict(X_test_std)
+
+    Test_MAE = mean_absolute_error(Y_test, Y_test_pred).round(2)
+    Test_RMSE = np.sqrt(mean_squared_error(Y_test, Y_test_pred)).round(2)
+    Test_MAPE = mean_absolute_percentage_error(Y_test, Y_test_pred).round(2)
 
     model_performance = model_performance.append({'Model': model_name, 'Train MAE': Train_MAE,
                                                   'Train RMSE': Train_RMSE, 'Train MAPE': Train_MAPE,
@@ -132,7 +140,7 @@ for model in models_to_evaluate:
 
     # copy the DataFrame indexes
     test_results = X_test.copy()
-    test_results["predicted"] = regr.predict(X_test_std)
+    test_results["predicted"] = Y_test_pred
     test_results["actual"] = Y_test
     test_results = test_results[['predicted', 'actual']]
     test_results['predicted'] = test_results['predicted'].round(2)
