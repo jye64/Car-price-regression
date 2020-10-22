@@ -9,7 +9,7 @@
 
 ## How to Run
 
-Run 'regression.py'
+see 'CarPrice_regression.ipynb'
 
 ## Dataset
 
